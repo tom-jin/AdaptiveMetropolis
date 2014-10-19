@@ -1,0 +1,29 @@
+\documentclass{article}
+
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage[round]{natbib}
+
+% The line below tells R to use knitr on this.
+%\VignetteEngine{knitr::knitr}
+
+\title{Adaptive Metropolis Hastings Algorithms}
+\author{Tom Jin \and Xiao Yu Lu}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We present the R package `AdaptiveMetropolis', which does some useful things.
+\end{abstract}
+
+\section{Introduction}
+\subsection{Related Work}
+\section{Adaptive MCMC Algorithms}
+\subsection{Adaptive Metropolis}
+\subsection{Adaptive Scaling Within Adaptive Metropolis}
+\subsection{Robust Adaptive Metropolis}
+\section{Testing}
+\section{Performance}
+
+\end{document}
