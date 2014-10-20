@@ -11,5 +11,6 @@ License: GPL-3
 Depends:
     MASS
 Suggests:
-    knitr
+    knitr,
+    testthat
 VignetteBuilder: knitr
