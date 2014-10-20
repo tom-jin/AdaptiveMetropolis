@@ -8,13 +8,13 @@
 #' @return n samples from the target distribution.
 RAM <- function(target, n, init.state, init.cov)  {
   d <- length(init.state)
-  res=matrix(,N,d)
+  res=matrix(,n,d)
   res[1,] = rep(0,d)
-  t0 = N/2
+  t0 = n/2
   alpha_star = 0.234
   S=diag(d)
   
-  for (t in 2:N) {
+  for (t in 2:n) {
     mean = res[t-1,]  
     U = rnorm(d)
     eta = min(1,d*t^(-2/3))
