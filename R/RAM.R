@@ -1,4 +1,12 @@
-RAM <- function(target, N, init.state, init.cov)  {
+#' Robust Adaptive Metropolis Sampler
+#' 
+#' @param target The target distribution where the unscaled densities can be 
+#' evaluated.
+#' @param n The number of samples to produce.
+#' @param init.state The initial state of the sampler.
+#' @param init.cov The initial covariance of the sampler.
+#' @return n samples from the target distribution.
+RAM <- function(target, n, init.state, init.cov)  {
   d <- length(init.state)
   res=matrix(,N,d)
   res[1,] = rep(0,d)
