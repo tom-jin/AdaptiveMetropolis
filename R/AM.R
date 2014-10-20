@@ -8,6 +8,8 @@
 #' @param init.period The number of samples to use init.cov instead of adapting 
 #' the covariance.
 #' @return n samples from the target distribution.
+#' @importFrom MASS mvrnorm
+#' @export
 #' @examples
 #' data <- AM(function(x) {dunif(x, 0,100)}, 1000, 0, 1, 10)
 #' plot(data)

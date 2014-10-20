@@ -6,6 +6,8 @@
 #' @param init.state The initial state of the sampler.
 #' @param init.cov The initial covariance of the sampler.
 #' @return n samples from the target distribution.
+#' @importFrom MASS mvrnorm
+#' @export
 ASWAM <- function(target, n, init.state, init.cov) {
   d <- length(init.state)
   X <- matrix(NA, nrow = n + 1, ncol = d)

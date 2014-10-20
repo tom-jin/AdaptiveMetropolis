@@ -5,6 +5,7 @@
 
 % The line below tells R to use knitr on this.
 %\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Introduction to Adaptive Metropolis}
 
 \title{Adaptive Metropolis Hastings Algorithms}
 \author{Tom Jin \and Xiao Yu Lu}
