@@ -14,9 +14,6 @@ evaluated.}
 \item{init.state}{The initial state of the sampler.}
 
 \item{init.cov}{The initial covariance of the sampler.}
-
-\item{init.period}{The number of samples to use init.cov instead of adapting
-the covariance.}
 }
 \value{
 n samples from the target distribution.
@@ -25,9 +22,9 @@ n samples from the target distribution.
 Adaptive Metropolis Sampler
 }
 \examples{
-data <- AM(function(x) {dunif(x, 0,100)}, 1000, 0, 1, 10)
+data <- AM(function(x) {dunif(x, 0,100)}, 1000, 0, 1)
 plot(data)
-data <- AM(function(x) {dunif(x, c(0,0), c(100,100))}, 1000, c(0,0), diag(2), 10)
+data <- AM(function(x) {dunif(x, c(0,0), c(100,100))}, 1000, c(0,0), diag(2))
 plot(data)
 }
 
