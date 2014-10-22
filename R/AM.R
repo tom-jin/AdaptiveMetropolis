@@ -5,8 +5,6 @@
 #' @param n The number of samples to produce.
 #' @param init.state The initial state of the sampler.
 #' @param init.cov The initial covariance of the sampler.
-#' @param init.period The number of samples to use init.cov instead of adapting 
-#' the covariance.
 #' @return n samples from the target distribution.
 #' @importFrom mvtnorm rmvnorm
 #' @export
