@@ -11,9 +11,9 @@
 #' @importFrom mvtnorm rmvnorm
 #' @export
 #' @examples
-#' data <- AM(function(x) {dunif(x, 0,100)}, 1000, 0, 1, 10)
+#' data <- AM(function(x) {dunif(x, 0,100)}, 1000, 0, 1)
 #' plot(data)
-#' data <- AM(function(x) {dunif(x, c(0,0), c(100,100))}, 1000, c(0,0), diag(2), 10)
+#' data <- AM(function(x) {dunif(x, c(0,0), c(100,100))}, 1000, c(0,0), diag(2))
 #' plot(data)
 AM <- function(target, n, init.state, init.cov) {
   d <- length(init.state)
