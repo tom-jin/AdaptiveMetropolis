@@ -17,9 +17,9 @@ devtools::install_github("tom-jin/AdaptiveMetropolis")
 
 ## Demo
 
-Start with a Normal(0,1) distribution explore a Unif(0,100) distribution for 10 steps. Then adapt the variance of the proposal distribution for enhanced mixing whilst exploring the target distribution.
+Start with a Normal(0,1) distribution explore a Unif(0,100) distribution. The variance of the proposal distribution is adapted to improve mixing whilst exploring the target distribution. The first 1000 samples are considered a burn in period and discarded.
 
 ```R
-data <- AM(function(x) {dunif(x, 0,100)}, 1000, 0, 1)
-plot(data)
+data <- AM(function(x) {dnorm(x, 0,100)}, 5000, 0, 1)
+plot(data[1001:5000])
 ```
