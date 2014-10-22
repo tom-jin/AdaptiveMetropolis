@@ -35,11 +35,11 @@ AM <- function(target, n, init.state, init.cov) {
     Xbarnew <- .colMeans(X[seq(1, i+1), ], i+1, d)
     
     # Update covariance
-    C <- ((i-1)/i) * C + (2.4^2)/(d*i) * ((i * Xbarold %*% t(Xbarold))
-                                          - ((i + 1 ) * Xbarnew %*% t(Xbarnew)) 
-                                          + (X[i+1, ] %*% t(X[i+1, ])) 
-                                          + .Machine$double.eps*100*diag(d))
-    #C <- cov(X[seq(1, i+1), ])
+    C <- ((i-1)/i) * C + 
+      (2.4^2)/(d*i) * ((i * Xbarold %*% t(Xbarold))
+                       - ((i + 1) * Xbarnew %*% t(Xbarnew)) 
+                       + (X[i+1, ] %*% t(X[i+1, ])) 
+                       + .Machine$double.eps*diag(d))
   }
   return(X[-1, ])
 }
