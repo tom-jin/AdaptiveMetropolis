@@ -3,7 +3,7 @@
 \alias{AM}
 \title{Adaptive Metropolis Sampler}
 \usage{
-AM(target, n, init.state, init.cov)
+AM(target, n, init.state, init.cov, burn.in = 1000)
 }
 \arguments{
 \item{target}{A function that evaluates the unscaled densities of the target
@@ -13,7 +13,9 @@ distribution.}
 
 \item{init.state}{The initial state of the sampler.}
 
-\item{init.cov}{The initial covariance of the sampler.}
+\item{init.cov}{The covariance of the sampler during burn in.}
+
+\item{burn.in}{(Optional) Number of iterations to burn in for. Default: 1000}
 }
 \value{
 \code{n} samples from the target distribution.
