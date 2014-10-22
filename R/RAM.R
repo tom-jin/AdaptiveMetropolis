@@ -6,7 +6,6 @@
 #' @param init.state The initial state of the sampler.
 #' @param init.cov The initial covariance of the sampler.
 #' @return n samples from the target distribution.
-#' @importFrom MASS mvrnorm
 #' @export
 RAM <- function(target, n, init.state, init.cov)  {
   d <- length(init.state)
@@ -20,7 +19,7 @@ RAM <- function(target, n, init.state, init.cov)  {
     mean <- res[t-1,]  
     U <- rnorm(d)
     eta <- min(1,d*t^(-2/3))
-    x <- mean + S %*% U
+    x <- as.vector(mean + S %*% U)
     alpha <- min(1,target(x)/target(res[t-1,]))
     u <- runif(1)
     

@@ -6,7 +6,7 @@
 #' @param init.state The initial state of the sampler.
 #' @param init.cov The initial covariance of the sampler.
 #' @return n samples from the target distribution.
-#' @importFrom MASS mvrnorm
+#' @importFrom mvtnorm rmvnorm
 #' @export
 ASWAM <- function(target, n, init.state, init.cov) {
   d <- length(init.state)
@@ -17,7 +17,7 @@ ASWAM <- function(target, n, init.state, init.cov) {
   sigma <- init.cov
   
   for(i in seq(1, n)) {
-    Y <- mvrnorm(n = 1, mu = X[i, ], Sigma = lambda * sigma)
+    Y <- as.vector(rmvnorm(n = 1, mean = X[i, ], sigma = as.matrix(lambda * sigma)))
     a <- min(1, target(Y)/target(X[i, ])) 
     
     if(runif(1) < a) 
@@ -29,8 +29,8 @@ ASWAM <- function(target, n, init.state, init.cov) {
       Xbarold <- mean(X[1:i, ])
       Xbarnew <- mean(X[seq(1, i+1), ])
     } else {
-      Xbarold <- colMeans(X[1:i, ])
-      Xbarnew <- colMeans(X[seq(1, i+1), ])
+      Xbarold <- .colMeans(X[1:i, ], i, d)
+      Xbarnew <- .colMeans(X[seq(1, i+1), ], i+1, d)
     }
     
     lambda <- exp(log(lambda) + a - 0.234)

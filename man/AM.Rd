@@ -3,7 +3,7 @@
 \alias{AM}
 \title{Adaptive Metropolis Sampler}
 \usage{
-AM(target, n, init.state, init.cov, init.period = 1000)
+AM(target, n, init.state, init.cov)
 }
 \arguments{
 \item{target}{The target distribution where the unscaled densities can be

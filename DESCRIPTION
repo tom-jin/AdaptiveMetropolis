@@ -9,7 +9,7 @@ Description: An implementation of the Adaptive Metropilis Algorithm as
     described by Haario et al.
 License: GPL-3
 Depends:
-    MASS
+    mvtnorm
 Suggests:
     knitr,
     testthat
