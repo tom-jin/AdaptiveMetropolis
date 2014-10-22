@@ -3,4 +3,4 @@
 export(AM)
 export(ASWAM)
 export(RAM)
-importFrom(mvtnorm,rmvnorm)
+importFrom(MASS,mvrnorm)

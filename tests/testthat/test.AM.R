@@ -1,3 +1,5 @@
+require(mvtnorm)
+
 test_that("AM passes 1D sanity test", {
   set.seed(0)
   data <- AM(function(x) {dnorm(x, 100,10)}, 5000, 0, 1)

@@ -6,7 +6,7 @@
 #' @param init.state The initial state of the sampler.
 #' @param init.cov The initial covariance of the sampler.
 #' @return n samples from the target distribution.
-#' @importFrom mvtnorm rmvnorm
+#' @importFrom MASS mvrnorm
 #' @export
 #' @examples
 #' data <- AM(function(x) {dunif(x, 0,100)}, 1000, 0, 1)
@@ -21,8 +21,8 @@ AM <- function(target, n, init.state, init.cov) {
   
   for(i in seq(1, n)) {
     # Propose a move
-    Y <- as.vector(rmvnorm(n = 1, mean = X[i, ], sigma = as.matrix(C), method = "chol"))
-    
+    Y <- mvrnorm(n = 1, mu = X[i, ], Sigma = C)
+    if(is.nan(Y[1])) stop ("Balls.")
     # Calculate acceptance ratio
     a <- min(1, target(Y)/target(X[i, ])) 
     
@@ -39,6 +39,7 @@ AM <- function(target, n, init.state, init.cov) {
                                           - ((i + 1 ) * Xbarnew %*% t(Xbarnew)) 
                                           + (X[i+1, ] %*% t(X[i+1, ])) 
                                           + .Machine$double.eps*100*diag(d))
+    #C <- cov(X[seq(1, i+1), ])
   }
   return(X[-1, ])
 }

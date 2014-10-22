@@ -6,7 +6,7 @@
 #' @param init.state The initial state of the sampler.
 #' @param init.cov The initial covariance of the sampler.
 #' @return n samples from the target distribution.
-#' @importFrom mvtnorm rmvnorm
+#' @importFrom MASS mvrnorm
 #' @export
 ASWAM <- function(target, n, init.state, init.cov) {
   d <- length(init.state)
@@ -17,7 +17,7 @@ ASWAM <- function(target, n, init.state, init.cov) {
   
   for(i in seq(1, n)) {
     # Propose a move
-    Y <- as.vector(rmvnorm(n = 1, mean = X[i, ], sigma = as.matrix(lambda * sigma)))
+    Y <- mvrnorm(n = 1, mu = X[i, ], Sigma = lambda * sigma)
     
     # Calculate acceptance ratio
     a <- min(1, target(Y)/target(X[i, ])) 

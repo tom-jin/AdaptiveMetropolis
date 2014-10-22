@@ -1,3 +1,5 @@
+require(mvtnorm)
+
 test_that("ASWAM passes 1D sanity test", {
   set.seed(0)
   data <- ASWAM(function(x) {dnorm(x, 100,10)}, 5000, 0, 1)
