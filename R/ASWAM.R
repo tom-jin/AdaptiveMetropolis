@@ -1,13 +1,46 @@
 #' Adaptive Scaling Within Adaptive Metropolis Sampler
 #' 
+#' An implementation of the Adaptive Scaling within Adaptive Metropolis algorithm
+#' as published by Andrieu and Thoms (2008).
+#' The adapted covariance matrix which encodes knowledge of the second moments 
+#' of the target distribution is scaled to achieve a target acceptance ratio.
+#' 
+#' The proposal distribution is a multivariate normal distribution of the 
+#' appropriate dimension. The covariance of this distribution is computed from
+#' previous samples and then scaled to aim for an acceptance rate of 0.234. This 
+#' is done to stike a balence between a high acceptance rate with poor mixing 
+#' and a low acceptance rate with periods of stationarity. Using diffusion 
+#' limits an acceptance rate of 0.234 has been found to be optimal.
+#' 
+#' This implementation does not have a burn in period and it is expected that 
+#' the user will select an appropriate number of samples to discard. Samples 
+#' generated whilst little is know about the target distribution may be highly 
+#' correlated and localised.
+#' 
+#' The dimension is detected using the length of the \code{init.state}
+#' parameter.
+#' 
+#' Adaptive samplers do not attempt to solve the problem of multi modal 
+#' distributions. If the target distribution is known to have multiple modes, 
+#' particually if they are far apart, more advanced techniques are recomended 
+#' such as nesting adaptive Metropolis within parallel tempering.
+#' 
 #' @param target The target distribution where the unscaled densities can be 
 #' evaluated.
 #' @param n The number of samples to produce.
 #' @param init.state The initial state of the sampler.
 #' @param init.cov The initial covariance of the sampler.
-#' @return n samples from the target distribution.
+#' @return \code{n} samples from the target distribution.
+#' @references Andrieu, C., Thoms, J. (2008) \emph{A tutorial on adaptive MCMC.} 
+#' Statistics and Computing, Vol. 18, Issue 4
+#' @author Tom Jin <sjin@@stats.ox.ac.uk>
 #' @importFrom MASS mvrnorm
 #' @export
+#' @examples 
+#' # 4D Multivariate normal
+#' library(mvtnorm)
+#' data <- ASWAM(function(x) {dmvnorm(x, rep(10, 4), 10*diag(4))}, 8000, rep(0, 4), diag(4))
+#' pairs(data[2001:8000,])
 ASWAM <- function(target, n, init.state, init.cov) {
   d <- length(init.state)
   X <- matrix(NA, nrow = n + 1, ncol = d)

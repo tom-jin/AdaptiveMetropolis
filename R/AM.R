@@ -1,18 +1,46 @@
 #' Adaptive Metropolis Sampler
 #' 
-#' @param target The target distribution where the unscaled densities can be 
-#' evaluated.
+#' An implementation of the Adaptive Metropolis algorithm as proposed by Haario 
+#' et al (2001). 
+#' The covariance matrix of the proposal distribution is adapted with current 
+#' knowledge of the target distrubution.
+#' 
+#' The proposal distribution is a multivariate normal distribution of the 
+#' appropriate dimension. The covariance of this distribution is computed from
+#' previous samples.
+#' 
+#' This implementation does not have a burn in period and it is expected that 
+#' the user will select an appropriate number of samples to discard. Samples 
+#' generated whilst little is know about the target distribution may be highly 
+#' correlated and localised.
+#' 
+#' The dimension is detected using the length of the \code{init.state}
+#' parameter.
+#' 
+#' Adaptive samplers do not attempt to solve the problem of multi modal 
+#' distributions. If the target distribution is known to have multiple modes, 
+#' particually if they are far apart, more advanced techniques are recomended 
+#' such as nesting adaptive Metropolis within parallel tempering.
+#' 
+#' @param target A function that evaluates the unscaled densities of the target 
+#' distribution. 
 #' @param n The number of samples to produce.
 #' @param init.state The initial state of the sampler.
 #' @param init.cov The initial covariance of the sampler.
-#' @return n samples from the target distribution.
+#' @return \code{n} samples from the target distribution.
+#' @references Haario, H., Saksman, E., Tamminen, J. (2001) 
+#' \emph{An Adaptive Metropolis Algorithm.} Bernoulli, Vol. 7, No. 2.
+#' @author Tom Jin <sjin@@stats.ox.ac.uk>
 #' @importFrom MASS mvrnorm
 #' @export
 #' @examples
-#' data <- AM(function(x) {dunif(x, 0,100)}, 1000, 0, 1)
-#' plot(data)
-#' data <- AM(function(x) {dunif(x, c(0,0), c(100,100))}, 1000, c(0,0), diag(2))
-#' plot(data)
+#' # 1D Normal Distribution
+#' data <- AM(function(x) {dnorm(x, 0,100)}, 5000, 0, 1)
+#' plot(data[1001:5000])
+#' 
+#' # 2D Uniform Distribution
+#' data <- AM(function(x) {dunif(x, c(0,0), c(100,100))}, 5000, c(0,0), diag(2))
+#' plot(data[1001:5000,])
 AM <- function(target, n, init.state, init.cov) {
   d <- length(init.state)
   X <- matrix(NA, nrow = n + 1, ncol = d)
