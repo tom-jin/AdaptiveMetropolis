@@ -1,4 +1,4 @@
-validateInput <- function(target, n, init.state, init.cov) {
+validateInput <- function(target, n, init.state, init.cov, burn.in = 0) {
   if(!is.function(target))
     stop("target must be a function that evaluates the target distribution")
   
@@ -22,4 +22,7 @@ validateInput <- function(target, n, init.state, init.cov) {
     #TODO: Check for positive definiteness.
     #TODO: Check for symmetry.
   }
+  
+  if(!is.numeric(burn.in) | burn.in < 0)
+    stop("burn.in must be a non-negative number")
 }

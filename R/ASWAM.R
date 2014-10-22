@@ -29,7 +29,8 @@
 #' evaluated.
 #' @param n The number of samples to produce.
 #' @param init.state The initial state of the sampler.
-#' @param init.cov The initial covariance of the sampler.
+#' @param init.cov The covariance of the sampler during burn in.
+#' @param burn.in (Optional) Number of iterations to burn in for. Default: 1000
 #' @return \code{n} samples from the target distribution.
 #' @references Andrieu, C., Thoms, J. (2008) \emph{A tutorial on adaptive MCMC.} 
 #' Statistics and Computing, Vol. 18, Issue 4
@@ -40,19 +41,41 @@
 #' # 4D Multivariate normal
 #' library(mvtnorm)
 #' data <- ASWAM(function(x) {dmvnorm(x, rep(10, 4), 10*diag(4))}, 8000, rep(0, 4), diag(4))
-#' pairs(data[2001:8000,])
-ASWAM <- function(target, n, init.state, init.cov) {
+#' pairs(data)
+ASWAM <- function(target, n, init.state, init.cov, burn.in = 1000) {
   # Input validation
-  validateInput(target, n, init.state, init.cov)
+  validateInput(target, n, init.state, init.cov, burn.in)
   
   # Init variables
   d <- length(init.state)
-  X <- matrix(NA, nrow = n + 1, ncol = d)
+  X <- matrix(NA, nrow = n + burn.in + 1, ncol = d)
   X[1, ] <- init.state
   lambda <- 1
-  sigma <- init.cov
   
-  for(i in seq(1, n)) {
+  
+  # Vanilla Metropolis phase. (Burn in)
+  if (burn.in > 0)
+    for(i in seq(1, burn.in)) {
+      # Propose a move
+      Y <- mvrnorm(n = 1, mu = X[i, ], Sigma = init.cov)
+      
+      # Calculate acceptance ratio
+      a <- min(1, target(Y)/target(X[i, ])) 
+      
+      if(runif(1) < a) 
+        X[i+1, ] <- Y # Accept
+      else
+        X[i+1, ] <- X[i, ] # Reject
+    }
+  
+  # Initialise covariance
+  if(burn.in > 1) {
+    sigma <- var(X[seq(1, burn.in), ])
+  } else {
+    sigma <- init.cov
+  }
+  
+  for(i in seq(1, n) + burn.in) {
     # Propose a move
     Y <- mvrnorm(n = 1, mu = X[i, ], Sigma = lambda * sigma)
     
@@ -76,5 +99,5 @@ ASWAM <- function(target, n, init.state, init.cov) {
                                           + (X[i+1, ] %*% t(X[i+1, ])) 
                                           + .Machine$double.eps*diag(d))
   }
-  return(X[-1, ])
+  return(X[-seq(1, burn.in + 1), ])
 }

@@ -3,7 +3,7 @@
 \alias{ASWAM}
 \title{Adaptive Scaling Within Adaptive Metropolis Sampler}
 \usage{
-ASWAM(target, n, init.state, init.cov)
+ASWAM(target, n, init.state, init.cov, burn.in = 1000)
 }
 \arguments{
 \item{target}{The target distribution where the unscaled densities can be
@@ -13,7 +13,9 @@ evaluated.}
 
 \item{init.state}{The initial state of the sampler.}
 
-\item{init.cov}{The initial covariance of the sampler.}
+\item{init.cov}{The covariance of the sampler during burn in.}
+
+\item{burn.in}{(Optional) Number of iterations to burn in for. Default: 1000}
 }
 \value{
 \code{n} samples from the target distribution.
@@ -49,7 +51,7 @@ such as nesting adaptive Metropolis within parallel tempering.
 # 4D Multivariate normal
 library(mvtnorm)
 data <- ASWAM(function(x) {dmvnorm(x, rep(10, 4), 10*diag(4))}, 8000, rep(0, 4), diag(4))
-pairs(data[2001:8000,])
+pairs(data)
 }
 \author{
 Tom Jin <sjin@stats.ox.ac.uk>
