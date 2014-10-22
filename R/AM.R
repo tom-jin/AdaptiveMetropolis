@@ -42,6 +42,10 @@
 #' data <- AM(function(x) {dunif(x, c(0,0), c(100,100))}, 5000, c(0,0), diag(2))
 #' plot(data[1001:5000,])
 AM <- function(target, n, init.state, init.cov) {
+  # Input validation
+  validateInput(target, n, init.state, init.cov)
+  
+  # Init variables
   d <- length(init.state)
   X <- matrix(NA, nrow = n + 1, ncol = d)
   X[1, ] <- init.state

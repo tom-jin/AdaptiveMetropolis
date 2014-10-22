@@ -42,6 +42,10 @@
 #' data <- ASWAM(function(x) {dmvnorm(x, rep(10, 4), 10*diag(4))}, 8000, rep(0, 4), diag(4))
 #' pairs(data[2001:8000,])
 ASWAM <- function(target, n, init.state, init.cov) {
+  # Input validation
+  validateInput(target, n, init.state, init.cov)
+  
+  # Init variables
   d <- length(init.state)
   X <- matrix(NA, nrow = n + 1, ncol = d)
   X[1, ] <- init.state

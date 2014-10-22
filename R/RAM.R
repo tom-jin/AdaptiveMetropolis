@@ -8,6 +8,10 @@
 #' @return n samples from the target distribution.
 #' @export
 RAM <- function(target, n, init.state, init.cov)  {
+  # Input validation
+  validateInput(target, n, init.state, init.cov)
+  
+  # Init variables
   d <- length(init.state)
   res <- matrix(,n,d)
   res[1,] <- rep(0,d)
