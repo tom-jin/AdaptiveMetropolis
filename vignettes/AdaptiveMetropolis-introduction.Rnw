@@ -1,5 +1,5 @@
 \documentclass{article}
-
+\usepackage{hyperref}
 \usepackage{amsmath, amsthm, amssymb}
 \usepackage[round]{natbib}
 
@@ -15,16 +15,136 @@
 \maketitle
 
 \begin{abstract}
-We present the R package `AdaptiveMetropolis', which does some useful things.
+We present the R package `AdaptiveMetropolis', which implements several adaptive Metropolis Hastings algorithms. 
+These adaptive algorithms use various strategies to overcome a lack of knowledge about the target distribution by adapting the proposal distribution with the information inferred from sampling.
 \end{abstract}
 
 \section{Introduction}
+<<packages, message=FALSE>>= 
+require(AdaptiveMetropolis) 
+@
+This package implements a sequence of adaptive Metropolis Hastings algorithms that build on the each other to adapt to more complex distributions and one algorithm to handle nested models.
+
+
+
 \subsection{Related Work}
 \section{Adaptive MCMC Algorithms}
 \subsection{Adaptive Metropolis}
+The Adaptive Metropolis algorithm as described by \citet{haario} is the first in a family of Metropolis Hastings samplers that foregoes reversibility in the Markov chain in favour of continuous updates to the proposal distribution.
+Adaptation allows for distributions to be explored much quicker than standard Metropolis Hastings with a poorly tuned proposal distribution.
+
+For this algorithm it is essential that a burn in of some length is run to prevent trapping the chain in a lower dimensional subspace.
+This happens when the initial jumps are very close together and very correlated causing subsequent samples to be highly correlated until the chain breaks free after several thousand iterations. 
+By running a burn in phase of random walk Metropolis Hastings the chain has had the opportunity to explore a little and adapt much faster.
+
+<<AM-code, eval=FALSE>>=
+data <- AM(function(x) {dnorm(x, 100,100)}, 5000, 0, 1)
+plot(data)
+@
+
+
+<<AM-plots, cache=TRUE, echo=FALSE, message=FALSE>>=
+require(MASS)
+target <- function(x) {dnorm(x, 100,100)}
+n <- 5000
+init.state <- 0
+init.cov <- 1
+burn.in <- 1000
+
+# Init variables
+  d <- length(init.state)
+  X <- matrix(NA, nrow = n + burn.in + 1, ncol = d)
+  X[1, ] <- init.state
+  C <- rep(init.cov, n + burn.in + 1)
+
+  # Vanilla Metropolis phase. (Burn in)
+  if (burn.in > 0)
+    for(i in seq(1, burn.in)) {
+      # Propose a move
+      Y <- mvrnorm(n = 1, mu = X[i, ], Sigma = init.cov)
+      
+      # Calculate acceptance ratio
+      a <- min(1, target(Y)/target(X[i, ])) 
+      
+      if(runif(1) < a) 
+        X[i+1, ] <- Y # Accept
+      else
+        X[i+1, ] <- X[i, ] # Reject
+    }
+  
+  # Initialise covariance
+  if(burn.in > 1) {
+    C[burn.in+1] <- var(X[seq(1, burn.in), ])
+  }
+
+  # Adapted Metropolis phase
+  for(i in seq(1, n) + burn.in) {
+    # Propose a move
+    Y <- mvrnorm(n = 1, mu = X[i, ], Sigma = C[i])
+
+    # Calculate acceptance ratio
+    a <- min(1, target(Y)/target(X[i, ])) 
+    
+    if(runif(1) < a) 
+      X[i+1, ] <- Y # Accept
+    else
+      X[i+1, ] <- X[i, ] # Reject
+    
+    Xbarold <- .colMeans(X[1:i, ], i, d)
+    Xbarnew <- .colMeans(X[seq(1, i+1), ], i+1, d)
+    
+    # Update covariance
+    C[i+1] <- ((i-1)/i) * C[i] + 
+      (2.4^2)/(d*i) * ((i * Xbarold %*% t(Xbarold))
+                       - ((i + 1) * Xbarnew %*% t(Xbarnew)) 
+                       + (X[i+1, ] %*% t(X[i+1, ])) 
+                       + .Machine$double.eps*diag(d))
+  }
+#par(mfrow=c(1,2))
+@
+<<AM-trace, cache=TRUE, echo=FALSE, message=FALSE>>=
+plot(X, xlab = "Sample", ylab = "Value")
+abline(v = 1000)
+@
+
+In this example run no knowledge of the target distribution is assumed and the proposal distribution is set up as a univariate Gaussian with mean 0 and variance 1 but unknown to the sampler target distributions is a univariate Gaussian with mean 100 and variance 100. The sampler will have to find the mode and adapt its variance in order to explore it effectively.
+
+Normally the burn in samples are discarded due to poor mixing. They can be observed on the left of the vertical line at sample 1000. As soon as the adaptation begins the varaince exploads and slowly tends towards variance 50000. Within a small number of iterations much of the mode has been explored.
+
+<<AM-variance, cache=TRUE, echo=FALSE, message=FALSE>>=
+plot(C, xlab = "Sample", ylab = "Variance")
+abline(v = 1000)
+@
+
 \subsection{Adaptive Scaling Within Adaptive Metropolis}
+An adaptive scaling with adaptive Metropolis implementation based on \citet{andrieu} scales its variance matrix in order to achieve a 0.23 acceptance ratio.
+
+<<ASWAM, cache=TRUE>>=
+library(mvtnorm)
+data <- ASWAM(function(x) {dmvnorm(x, rep(10, 8), 10*diag(8))}, 
+              1000, rep(0, 8), diag(8))
+pairs(data)
+@
+
+
 \subsection{Robust Adaptive Metropolis}
+\subsection{Adaptive Metropolis-Within-Gibbs}
 \section{Testing}
-\section{Performance}
+
+This package includes a suite of unit tests written in testthat to validate the functions AM, ASWAM and RAM. 
+The tests verify that all of the samplers produce sane results when run to sample from some common distributions in one and multiple dimensions.
+The tests also verify the the internal parameter validation function is correctly rejecting invalid parameters.
+
+The testing of this package is integrated with \href{https://travis-ci.org/}{Travis CI}. The continuous integration platform builds and tests the package as code is committed to the package's repository. 
+
+\section{Future Work}
+The looped nature of these algorithms would potentially benefit from an implementation using \href{http://www.rcpp.org/}{Rcpp} to achieve near native performance with for loops.
+However as long as these samplers accept arbitrary density functions within R there will be a performance penalty when evaluating these densities from within C++. This penalty will remain even if the density itself is a native C/C++/Fortran function as a call will have to be made from C++ to R and then to another compiled language.
+
+Adaptive Metropolis Hastings algorithms do not solve the issues caused by multimodal distributions.
+If the modes of a target distribution are far enough apart it is possible that a chain never finds the other modes and adapts itself only to the mode it has found.
+
+\bibliographystyle{plainnat}
+\bibliography{adaptive}
 
 \end{document}
