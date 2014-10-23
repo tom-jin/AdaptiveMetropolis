@@ -13,7 +13,7 @@ AMWG(adapt, N, K)
 \item{K}{number of latent variables}
 }
 \value{
-A list containing simulated parameters paths (theta) and acceptance ratio paths (acceptance).
+A list containing simulated parameters paths (theta) and acceptance/rejection paths (acceptance).
 }
 \description{
 Adaptive Metropolis-Hastings algorithm within the Gibbs algorithm, applied to a specific hierachical model.

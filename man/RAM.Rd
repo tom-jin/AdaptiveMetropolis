@@ -3,17 +3,17 @@
 \alias{RAM}
 \title{Robust Adaptive Metropolis Sampler}
 \usage{
-RAM(target, n, init.state, init.cov)
+RAM(target, N, init.state, init.cov)
 }
 \arguments{
 \item{target}{The target distribution where the unscaled densities can be
 evaluated.}
 
-\item{n}{The number of samples to produce.}
-
 \item{init.state}{The initial state of the sampler.}
 
 \item{init.cov}{The initial covariance of the sampler.}
+
+\item{n}{The number of samples to produce.}
 }
 \value{
 n samples from the target distribution.
