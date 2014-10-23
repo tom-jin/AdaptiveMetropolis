@@ -10,18 +10,18 @@
 #' @param init.cov The initial covariance of the sampler.
 #' @return n samples from the target distribution.
 #' @export
-RAM <- function(target, N, init.state, init.cov)  {
+RAM <- function(target, n, init.state, init.cov)  {
   # Input validation
   validateInput(target, n, init.state, init.cov, burn.in)
   
   d <- length(init.state)  # dimension of the space of interest
-  res <- matrix(, N, d)         # set up the result matrix, where each row n represents the parameter of length d at time n 
+  res <- matrix(, n, d)         # set up the result matrix, where each row n represents the parameter of length d at time n 
   res[1, ] <- init.state     # store the initial state as the first result
-  t0 <- N/2                 # burn-in period is set to be N/2, where N is the number of iterations
+  t0 <- n/2                 # burn-in period is set to be N/2, where N is the number of iterations
   alpha_star <- 0.234       # target mean acceptance rate is set to be 0.234 according to some popular theoretical result
   S <- diag(d)                # initial covariance is set to be the identity matrix, i.e. components are independent
   
-  for (t in 2:N) {
+  for (t in 2:n) {
     eta <- min(1, d*t^(-2/3))     # set eta
     
     mean <- res[t-1, ]       # set the mean for the proposal to be the current state
