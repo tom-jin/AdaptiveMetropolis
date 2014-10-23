@@ -31,11 +31,6 @@ The proposal distribution is a multivariate normal distribution of the
 appropriate dimension. The covariance of this distribution is computed from
 previous samples.
 
-This implementation does not have a burn in period and it is expected that
-the user will select an appropriate number of samples to discard. Samples
-generated whilst little is know about the target distribution may be highly
-correlated and localised.
-
 The dimension is detected using the length of the \code{init.state}
 parameter.
 
