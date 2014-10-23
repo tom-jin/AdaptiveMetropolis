@@ -5,13 +5,13 @@ Version: 1.0
 Date: 2014-10-16
 Author: Tom Jin, Xiaoyu Lu
 Maintainer: Tom Jin <sjin@stats.ox.ac.uk>
-Description: An implementation of the Adaptive Metropilis Algorithm as
-    described by Haario et al.
+Description: Implementations of some Adaptive Metropilis Algorithms.
 License: GPL-3
 Depends:
     MASS
 Suggests:
     knitr,
     testthat,
-    mvtnorm
+    mvtnorm,
+    mnormt
 VignetteBuilder: knitr

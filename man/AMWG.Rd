@@ -13,13 +13,16 @@ AMWG(adapt, N, K)
 \item{K}{number of latent variables}
 }
 \value{
-A list containing simulated parameters paths (theta) and acceptance/rejection paths (acceptance).
+A list containing simulated parameters paths (theta) and
+acceptance/rejection paths (acceptance).
 }
 \description{
-Adaptive Metropolis-Hastings algorithm within the Gibbs algorithm, applied to a specific hierachical model.
+Adaptive Metropolis-Hastings algorithm within the Gibbs algorithm, applied to
+a specific hierachical model.
 }
 \details{
-Update parameter one by one using a normal proposal, accept it with probability depending on the simulated path.
+Update parameter one by one using a normal proposal, accept it with
+probability depending on the simulated path.
 }
 \examples{
 out_noadapt <- AMWG(adapt = 0, 1000, 100)
@@ -33,6 +36,7 @@ points(theta_adapt[,1],col=2)
 Xiaoyu Lu
 }
 \references{
-Roberts, G. O., Rosenthal, J. S. (2006), \emph{Examples of Adaptive MCMC}
+Roberts, G. O., Rosenthal, J. S. (2006),
+\emph{Examples of Adaptive MCMC}
 }
 
