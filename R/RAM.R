@@ -12,7 +12,7 @@
 #' @export
 RAM <- function(target, n, init.state, init.cov)  {
   # Input validation
-  validateInput(target, n, init.state, init.cov, burn.in)
+  validateInput(target, n, init.state, init.cov)
   
   d <- length(init.state)  # dimension of the space of interest
   res <- matrix(, n, d)         # set up the result matrix, where each row n represents the parameter of length d at time n 
