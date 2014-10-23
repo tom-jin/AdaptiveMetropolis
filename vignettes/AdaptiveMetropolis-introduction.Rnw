@@ -128,7 +128,144 @@ pairs(data)
 
 
 \subsection{Robust Adaptive Metropolis}
+
+\subsubsection{Introduction}
+
+The Robust Adaptive Metropolis Algorithm (RAM) is an extension of the normal Metropoliis-Hasting Algorithm, where it estimates the shape of the target distribution and coerces the acceptance rate simultaneously, by adapting the proposal covariance structuring according to the data one has simulated. The adaptation rule is computationally simple adding no extra cost compared with the AM algorithm.
+
+\subsubsection{Algorithm}
+
+Suppose the proposal density $q$ is spherically symmetric. Let $S \in \mathbf{R}^{d \times d}$ be a lower-diagonal matrix with positive diagonal elements, $\{\eta_n\}$ be a step size sequence decaying to zero, $\alpha_*$ be the target mean acceptance probability. The RAM algorithm is defined as:
+
+for n = 1,2,..., iterate:
+
+\begin{itemize}
+
+\item compute $X := X_{n-1} + S_{n-1}U_n$, where $U_n \sim q$ is an independent random vector.
+\item with probability $\alpha_n : = \min(1,\pi(X)/\pi(X_{n-1}))$, set $X_n = X$ and $X_n = X_{n-1}$ otherwise.
+\item update $S_n$ through the equation: \\
+
+\hspace{3cm}  $S_nS_n^T = S_{n-1}(I + \eta_n(\alpha_n - \alpha_*)\frac{U_nU_n^T}{\|U_n\|^2})S_{n-1}^T$,  
+            
+where $I \in \mathbf{R}^{d \times d}$ stands for the identity matrix.
+\end{itemize}
+
+\noindent Note there is a unique $S_n$ satisfying 3 above, since the right hand side is symmetric and positive definite.
+
+
+\subsubsection{Inputs and outputs}
+the RAM algorithm takes 4 inputs including the target distribution $\pi$ (target), the number of iterations (N), the initial state (init.state) and the initial covariance structure for the MVN proposal (init.cov). The output is of a matrix form, recording the simulated path.
+
+
+\subsubsection{Example}
+We implement a toy example here. We set the initial state to be the origin in a 3-dimensional space, and the target distribution is a standard MVN with identity covariance structure, and we iterate for 10,000 times:
+
+<<chunk1>>=
+library(mvtnorm)  
+init.state = c(0,0,0)  
+d = length(init.state) 
+init.cov = diag(d)      
+target = function(x) {  
+   return(dmvnorm(t(x),rep(0,d),diag(d)))  
+}
+
+res <- RAM(target,10000,init.state,init.cov)
+@
+
+The traceplot of the 1st component and the histogram can be found below:
+
+<<chunk2>>=
+par(mfrow=c(2,1))
+plot(res[,1],type = "l",xlab="iteration",main="traceplot ")
+hist(res[,1],main="histogram")
+@
+
+
 \subsection{Adaptive Metropolis-Within-Gibbs}
+
+
+\subsubsection{introduction}
+We implement one of the examples in Gareth's\cite{Gareth} paper, namely the Metropolis Within Gibbs Algorithm (MWGA), which applies the algorithm to a hierarchical model:
+
+\begin{itemize}
+\item Each observation $Y_{ij} \sim N(\theta_i,V)$ for $[1 \leq j \leq r_i]$.
+\item Each parameter $\theta_i \sim Cauchy(\mu,A)$ for $[1 \leq i \leq K]$.
+\item $\mu, A, V$ follow $N(0,1), IG(1,1), IG(1,1)$ respectively.
+\end{itemize}
+\subsubsection{Algorithm}
+The AMWG algorithm extends the usual Gibbs sampler, so that we update each parameter using a random walk proposal, and accept or reject it with certain acceptance probability, which is adapted in each iteration according to the simulated path one has already obtained at that time.
+
+In each $n^{th}$ "batch", we append $A, V, \mu$ to $\theta$ and update each of the (K+3) parameters in turn by proposing a $N(0,\sigma_{i,n}^2)$ increment, where $sigma$ is adjusted according to the following rule: \\
+\begin{itemize}
+\item Set $\sigma_{i,n} = 1$ when $n<50$ for $1 \leq i \leq K+3$.
+\item Update $\log(\sigma_{i,n}) = \log(\sigma_{i,n}) + \delta(n)$ \;\;\ if proportion(accepted $\theta_i$s) $\geq 0.44$; \\ 
+\hspace*{2.9cm} $\log(\sigma_{i,n}) - \delta(n)$ \;\; if proportion(accepted $\theta_i$s) $\leq 0.44$. \\
+
+where $\delta(n)$ decays to 0 and is chosen to be $\min(0.005,n^{-1/2}).$
+\end{itemize}
+
+\subsubsection{Inputs and Outputs}
+AMWG takes three inputs including whether the proposal variance is adapted (adapt), the number of iterations(N) and the number of parameters $\theta$(K). The output contains a list of the parameter ($\theta, A, V, \mu$) paths and the acceptance/rejection paths.
+
+\subsubsection{Example}
+
+We can compare the adapted and unadapted version of the algorithm with $N=1000$ and $K=500$:
+<<chunk3>>=
+out_unadapt <- AMWG(adapt = 0, 1000, 500)
+theta_unadapt <- out_unadapt[[1]]
+acceptance_unadapt <- out_unadapt[[2]]
+out_adapt <- AMWG(adapt = 1, 1000, 500)
+theta_adapt <- out_adapt[[1]]
+acceptance_adapt <- out_adapt[[2]]
+
+plot(theta_unadapt[,1],type="l",xlab="number of batch",ylab=expression(theta[1]),main=expression('traceplots of '*theta[1]*' using Metropolis within Gibbs'))
+lines(theta_adapt[,1],col=2)
+legend("topright",c("unadapted","adapted"),col=c(1,2),lwd=c(2,2))
+@
+
+The histograms of the proportion of accepted parameters until the $N^{th}$ batch are displayed here:
+<<chunk4>>=
+par(mfrow=c(2,1))
+hist(colMeans(acceptance_unadapt),main="histogram of acceptance ratio for K+3 parameters (unadapted)",xlab="",breaks=50)
+hist(colMeans(acceptance_adapt),main="histogram of acceptance ratio for K+3 parameters (adapted)",xlab="",breaks=50)
+@
+
+It can be seen that AMWG pulls the acceptance ratio towards 0.44, which is optimal in many settings.
+
+\subsection{Comparison}
+We compare the three generic algorithms(AM, ASWAM, RAM) here using a 2-dimensional student distribution with degrees of freedom equal to 1. The simulated patterns are displayed below:
+
+
+<<result = F>>=
+library(mnormt)
+library(lattice)
+library(coda)
+@
+
+<<>>=
+N=10000
+init.state = rnorm(2)    #random initialization
+d = length(init.state)
+init.cov = diag(d)
+mean = c(1,2)
+sigma = matrix(c(0.2,0.1,0.1,0.8),2,2)
+target = function(x) {
+  return(dmt(t(x),mean,sigma,1))
+}
+
+resAM <- AM(target, N, init.state, init.cov)
+resASWAM <- ASWAM(target, N, init.state, init.cov)
+resRAM <- RAM(target, N, init.state, init.cov)
+
+plot(resAM[,1],resAM[,2])
+plot(resASWAM[,1],resASWAM[,2])
+plot(resRAM[,1],resRAM[,2])
+@
+
+It seems that in this case, AM and RAM have better performance compared with ASWAM.
+
+% data = rmt(n=1000,mean = mean, S = sigma, df = 1)
+% plot(data[,1],data[,2],xlim=c(-50,50),ylim=c(-50,50))
 \section{Testing}
 
 This package includes a suite of unit tests written in testthat to validate the functions AM, ASWAM and RAM. 
