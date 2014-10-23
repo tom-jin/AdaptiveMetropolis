@@ -5,7 +5,7 @@ require(AdaptiveMetropolis)
 #  data <- AM(function(x) {dnorm(x, 100,100)}, 5000, 0, 1)
 #  plot(data)
 
-## ----AM-plots, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5-------
+## ----AM-plots, cache=TRUE, echo=FALSE, message=FALSE---------------------
 require(MASS)
 target <- function(x) {dnorm(x, 100,100)}
 n <- 5000
@@ -64,11 +64,11 @@ burn.in <- 1000
   }
 #par(mfrow=c(1,2))
 
-## ----AM-trace, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5-------
+## ----AM-trace, cache=TRUE, echo=FALSE, message=FALSE, fig.height=4-------
 plot(X, xlab = "Sample", ylab = "Value")
 abline(v = 1000)
 
-## ----AM-variance, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5----
+## ----AM-variance, cache=TRUE, echo=FALSE, message=FALSE, fig.height=4----
 plot(C, xlab = "Sample", ylab = "Variance")
 abline(v = 1000)
 
@@ -84,7 +84,7 @@ res <- RAM(function(x) {dmvnorm(x, rep(0, 3), diag(3))}, 10000,
            c(0,0,0), diag(3))
 
 ## ----chunk2, cache=TRUE, echo=FALSE, fig.height=3------------------------
-plot(res[,1],type = "l",xlab="iteration",main="Traceplot")
+plot(res[,1],type = "l",xlab="Iteration",main="Traceplot")
 
 ## ----chunk2a, cache=TRUE, echo=FALSE, fig.height=3-----------------------
 hist(res[,1],main="Histogram")
@@ -98,14 +98,14 @@ theta_adapt <- out_adapt[[1]]
 acceptance_adapt <- out_adapt[[2]]
 
 ## ----chunk, cache=TRUE, echo=FALSE, fig.height=5-------------------------
-plot(theta_unadapt[,1],type="l",xlab="number of batch",ylab=expression(theta[1]),main=expression('traceplots of '*theta[1]*' using Metropolis within Gibbs'))
+plot(theta_unadapt[,1],type="l",xlab="Batch",ylab=expression(theta[1]),main=expression('Traceplots of '*theta[1]*' using Metropolis within Gibbs'))
 lines(theta_adapt[,1],col=2)
 legend("topright",c("unadapted","adapted"),col=c(1,2),lwd=c(2,2))
 
 ## ----chunk4, cache=TRUE, echo=FALSE, fig.height=5------------------------
 par(mfrow=c(2,1))
-hist(colMeans(acceptance_unadapt),main="histogram of acceptance ratio for K+3 parameters (unadapted)",xlab="",breaks=50)
-hist(colMeans(acceptance_adapt),main="histogram of acceptance ratio for K+3 parameters (adapted)",xlab="",breaks=50)
+hist(colMeans(acceptance_unadapt),main="Histogram of acceptance ratio for K+3 parameters (unadapted)",xlab="",breaks=50)
+hist(colMeans(acceptance_adapt),main="Histogram of acceptance ratio for K+3 parameters (adapted)",xlab="",breaks=50)
 
 ## ----echo=FALSE, cache=TRUE, fig.height=3--------------------------------
 library(mnormt)

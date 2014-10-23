@@ -20,15 +20,12 @@ These adaptive algorithms use various strategies to overcome a lack of knowledge
 \end{abstract}
 
 \section{Introduction}
+This package implements a sequence of adaptive Metropolis Hastings algorithms that build on the each other to adapt to more complex distributions and one algorithm to handle nested models.
+
+\section{Adaptive MCMC Algorithms}
 <<packages, message=FALSE, cache=TRUE>>= 
 require(AdaptiveMetropolis) 
 @
-This package implements a sequence of adaptive Metropolis Hastings algorithms that build on the each other to adapt to more complex distributions and one algorithm to handle nested models.
-
-
-
-\subsection{Related Work}
-\section{Adaptive MCMC Algorithms}
 \subsection{Adaptive Metropolis}
 The Adaptive Metropolis algorithm as described by \citet{haario} is the first in a family of Metropolis Hastings samplers that foregoes reversibility in the Markov chain in favour of continuous updates to the proposal distribution.
 Adaptation allows for distributions to be explored much quicker than standard Metropolis Hastings with a poorly tuned proposal distribution.
@@ -43,7 +40,7 @@ plot(data)
 @
 
 
-<<AM-plots, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5>>=
+<<AM-plots, cache=TRUE, echo=FALSE, message=FALSE>>=
 require(MASS)
 target <- function(x) {dnorm(x, 100,100)}
 n <- 5000
@@ -102,16 +99,16 @@ burn.in <- 1000
   }
 #par(mfrow=c(1,2))
 @
-<<AM-trace, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5>>=
+<<AM-trace, cache=TRUE, echo=FALSE, message=FALSE, fig.height=4>>=
 plot(X, xlab = "Sample", ylab = "Value")
 abline(v = 1000)
 @
 
 In this example run no knowledge of the target distribution is assumed and the proposal distribution is set up as a univariate Gaussian with mean 0 and variance 1 but unknown to the sampler target distributions is a univariate Gaussian with mean 100 and variance 100. The sampler will have to find the mode and adapt its variance in order to explore it effectively.
 
-Normally the burn in samples are discarded due to poor mixing. They can be observed on the left of the vertical line at sample 1000. As soon as the adaptation begins the varaince exploads and slowly tends towards variance 50000. Within a small number of iterations much of the mode has been explored.
+Normally the burn in samples are discarded due to poor mixing. They can be observed on the left of the vertical line at sample 1000. As soon as the adaptation begins the variance explodes and slowly tends towards variance 50000. Within a small number of iterations much of the mode has been explored.
 
-<<AM-variance, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5>>=
+<<AM-variance, cache=TRUE, echo=FALSE, message=FALSE, fig.height=4>>=
 plot(C, xlab = "Sample", ylab = "Variance")
 abline(v = 1000)
 @
@@ -130,7 +127,7 @@ pairs(data)
 
 \subsubsection{Introduction}
 
-The Robust Adaptive Metropolis Algorithm (RAM) is an extension of the normal Metropoliis-Hasting Algorithm, where it estimates the shape of the target distribution and coerces the acceptance rate simultaneously, by adapting the proposal covariance structuring according to the data one has simulated. The adaptation rule is computationally simple adding no extra cost compared with the AM algorithm.
+The Robust Adaptive Metropolis Algorithm (RAM) is an extension of the normal Metropolis-Hastings Algorithm, where it estimates the shape of the target distribution and coerces the acceptance rate simultaneously, by adapting the proposal covariance structuring according to the data one has simulated. The adaptation rule is computationally simple adding no extra cost compared with the AM algorithm.
 
 \subsubsection{Algorithm}
 
@@ -152,8 +149,9 @@ where $I \in \mathbf{R}^{d \times d}$ stands for the identity matrix.
 \noindent Note there is a unique $S_n$ satisfying 3 above, since the right hand side is symmetric and positive definite.
 
 
-\subsubsection{Inputs and outputs}
-the RAM algorithm takes 4 inputs including the target distribution $\pi$ (target), the number of iterations (N), the initial state (init.state) and the initial covariance structure for the MVN proposal (init.cov). The output is of a matrix form, recording the simulated path.
+\subsubsection{Inputs and Outputs}
+The RAM algorithm takes 4 inputs including the target distribution $\pi$ (target), the number of iterations (N), the initial state (init.state) and the initial covariance structure for the MVN proposal (init.cov).
+The output is of a matrix form, recording the simulated path.
 
 
 \subsubsection{Example}
@@ -168,7 +166,7 @@ res <- RAM(function(x) {dmvnorm(x, rep(0, 3), diag(3))}, 10000,
 The traceplot of the 1st component and the histogram can be found below:
 
 <<chunk2, cache=TRUE, echo=FALSE, fig.height=3>>=
-plot(res[,1],type = "l",xlab="iteration",main="Traceplot")
+plot(res[,1],type = "l",xlab="Iteration",main="Traceplot")
 @
 
 <<chunk2a, cache=TRUE, echo=FALSE, fig.height=3>>=
@@ -179,7 +177,7 @@ hist(res[,1],main="Histogram")
 \subsection{Adaptive Metropolis-Within-Gibbs}
 
 
-\subsubsection{introduction}
+\subsubsection{Introduction}
 We implement one of the examples in \citet{roberts}, namely the Metropolis Within Gibbs Algorithm (MWGA), which applies the algorithm to a hierarchical model:
 
 \begin{itemize}
@@ -215,7 +213,7 @@ acceptance_adapt <- out_adapt[[2]]
 @
 
 <<chunk, cache=TRUE, echo=FALSE, fig.height=5>>=
-plot(theta_unadapt[,1],type="l",xlab="number of batch",ylab=expression(theta[1]),main=expression('traceplots of '*theta[1]*' using Metropolis within Gibbs'))
+plot(theta_unadapt[,1],type="l",xlab="Batch",ylab=expression(theta[1]),main=expression('Traceplots of '*theta[1]*' using Metropolis within Gibbs'))
 lines(theta_adapt[,1],col=2)
 legend("topright",c("unadapted","adapted"),col=c(1,2),lwd=c(2,2))
 @
@@ -223,14 +221,14 @@ legend("topright",c("unadapted","adapted"),col=c(1,2),lwd=c(2,2))
 The histograms of the proportion of accepted parameters until the $N^{th}$ batch are displayed here:
 <<chunk4, cache=TRUE, echo=FALSE, fig.height=5>>=
 par(mfrow=c(2,1))
-hist(colMeans(acceptance_unadapt),main="histogram of acceptance ratio for K+3 parameters (unadapted)",xlab="",breaks=50)
-hist(colMeans(acceptance_adapt),main="histogram of acceptance ratio for K+3 parameters (adapted)",xlab="",breaks=50)
+hist(colMeans(acceptance_unadapt),main="Histogram of acceptance ratio for K+3 parameters (unadapted)",xlab="",breaks=50)
+hist(colMeans(acceptance_adapt),main="Histogram of acceptance ratio for K+3 parameters (adapted)",xlab="",breaks=50)
 @
 
 It can be seen that AMWG pulls the acceptance ratio towards 0.44, which is optimal in many settings.
 
 \subsection{Comparison}
-We compare the three generic algorithms(AM, ASWAM, RAM) here using a 2-dimensional student distribution with degrees of freedom equal to 1. The simulated patterns are displayed below:
+We compare the three generic algorithms(AM, ASWAM, RAM) here using a 2-dimensional student distribution with one degree of freedom. The simulated patterns are displayed below:
 
 <<echo=FALSE, cache=TRUE, fig.height=3>>=
 library(mnormt)
@@ -255,7 +253,7 @@ plot(resASWAM[,1],resASWAM[,2])
 plot(resRAM[,1],resRAM[,2])
 @
 
-It seems that in this case, AM and RAM have better performance compared with ASWAM.
+It seems that in this case, AM and RAM have better performance compared with ASWAM due to the low dimensionality of this problem.
 
 \section{Testing}
 
@@ -264,13 +262,16 @@ The tests verify that all of the samplers produce sane results when run to sampl
 The tests also verify the the internal parameter validation function is correctly rejecting invalid parameters.
 
 The testing of this package is integrated with \href{https://travis-ci.org/}{Travis CI}. The continuous integration platform builds and tests the package as code is committed to the package's repository. 
+Results of the latest build and test are available \href{https://travis-ci.org/tom-jin/AdaptiveMetropolis}{\texttt{https://travis-ci.org/tom-jin/AdaptiveMetropolis}}.
 
 \section{Future Work}
 The looped nature of these algorithms would potentially benefit from an implementation using \href{http://www.rcpp.org/}{Rcpp} to achieve near native performance with for loops.
-However as long as these samplers accept arbitrary density functions within R there will be a performance penalty when evaluating these densities from within C++. This penalty will remain even if the density itself is a native C/C++/Fortran function as a call will have to be made from C++ to R and then to another compiled language.
+However as long as these samplers accept arbitrary density functions within R there will be a performance penalty when evaluating these densities from within C++. 
+This penalty will remain even if the density itself is a native C/C++/Fortran function as a call will have to be made from C++ to R and then to another compiled language.
 
 Adaptive Metropolis Hastings algorithms do not solve the issues caused by multimodal distributions.
-If the modes of a target distribution are far enough apart it is possible that a chain never finds the other modes and adapts itself only to the mode it has found.
+If the modes of a target distribution are far enough apart it is possible that a chain never finds the other modes and adapts itself only to the mode it has found. 
+Nesting adaptive Metropolis within parallel tempering could overcome this as state swaps between chains run at different temperatures can expose different modes to the chain.
 
 \bibliographystyle{plainnat}
 \bibliography{adaptive}
