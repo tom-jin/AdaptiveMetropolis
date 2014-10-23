@@ -12,11 +12,6 @@
 #' and a low acceptance rate with periods of stationarity. Using diffusion 
 #' limits an acceptance rate of 0.234 has been found to be optimal.
 #' 
-#' This implementation does not have a burn in period and it is expected that 
-#' the user will select an appropriate number of samples to discard. Samples 
-#' generated whilst little is know about the target distribution may be highly 
-#' correlated and localised.
-#' 
 #' The dimension is detected using the length of the \code{init.state}
 #' parameter.
 #' 
