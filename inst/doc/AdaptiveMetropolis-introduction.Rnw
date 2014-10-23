@@ -126,7 +126,6 @@ data <- ASWAM(function(x) {dmvnorm(x, rep(10, 8), 10*diag(8))},
 pairs(data)
 @
 
-
 \subsection{Robust Adaptive Metropolis}
 
 \subsubsection{Introduction}
@@ -160,24 +159,20 @@ the RAM algorithm takes 4 inputs including the target distribution $\pi$ (target
 \subsubsection{Example}
 We implement a toy example here. We set the initial state to be the origin in a 3-dimensional space, and the target distribution is a standard MVN with identity covariance structure, and we iterate for 10,000 times:
 
-<<chunk1>>=
+<<chunk1, cache=TRUE>>=
 library(mvtnorm)  
-init.state = c(0,0,0)  
-d = length(init.state) 
-init.cov = diag(d)      
-target = function(x) {  
-   return(dmvnorm(t(x),rep(0,d),diag(d)))  
-}
-
-res <- RAM(target,10000,init.state,init.cov)
+res <- RAM(function(x) {dmvnorm(x, rep(0, 3), diag(3))}, 10000, 
+           c(0,0,0), diag(3))
 @
 
 The traceplot of the 1st component and the histogram can be found below:
 
-<<chunk2>>=
-par(mfrow=c(2,1))
-plot(res[,1],type = "l",xlab="iteration",main="traceplot ")
-hist(res[,1],main="histogram")
+<<chunk2, cache=TRUE, echo=FALSE, fig.height=3>>=
+plot(res[,1],type = "l",xlab="iteration",main="Traceplot")
+@
+
+<<chunk2a, cache=TRUE, echo=FALSE, fig.height=3>>=
+hist(res[,1],main="Histogram")
 @
 
 
@@ -210,21 +205,23 @@ AMWG takes three inputs including whether the proposal variance is adapted (adap
 \subsubsection{Example}
 
 We can compare the adapted and unadapted version of the algorithm with $N=1000$ and $K=500$:
-<<chunk3>>=
+<<chunk3, cache=TRUE>>=
 out_unadapt <- AMWG(adapt = 0, 1000, 500)
 theta_unadapt <- out_unadapt[[1]]
 acceptance_unadapt <- out_unadapt[[2]]
 out_adapt <- AMWG(adapt = 1, 1000, 500)
 theta_adapt <- out_adapt[[1]]
 acceptance_adapt <- out_adapt[[2]]
+@
 
+<<chunk, cache=TRUE, echo=FALSE, fig.height=5>>=
 plot(theta_unadapt[,1],type="l",xlab="number of batch",ylab=expression(theta[1]),main=expression('traceplots of '*theta[1]*' using Metropolis within Gibbs'))
 lines(theta_adapt[,1],col=2)
 legend("topright",c("unadapted","adapted"),col=c(1,2),lwd=c(2,2))
 @
 
 The histograms of the proportion of accepted parameters until the $N^{th}$ batch are displayed here:
-<<chunk4>>=
+<<chunk4, cache=TRUE, echo=FALSE, fig.height=5>>=
 par(mfrow=c(2,1))
 hist(colMeans(acceptance_unadapt),main="histogram of acceptance ratio for K+3 parameters (unadapted)",xlab="",breaks=50)
 hist(colMeans(acceptance_adapt),main="histogram of acceptance ratio for K+3 parameters (adapted)",xlab="",breaks=50)
@@ -235,13 +232,8 @@ It can be seen that AMWG pulls the acceptance ratio towards 0.44, which is optim
 \subsection{Comparison}
 We compare the three generic algorithms(AM, ASWAM, RAM) here using a 2-dimensional student distribution with degrees of freedom equal to 1. The simulated patterns are displayed below:
 
-
-<<result = F>>=
+<<echo=FALSE, cache=TRUE, fig.height=3>>=
 library(mnormt)
-library(lattice)
-library(coda)
-@
-<<>>=
 N=10000
 init.state = rnorm(2)    #random initialization
 d = length(init.state)
@@ -256,6 +248,8 @@ resAM <- AM(target, N, init.state, init.cov)
 resASWAM <- ASWAM(target, N, init.state, init.cov)
 resRAM <- RAM(target, N, init.state, init.cov)
 
+par(mfrow=c(1,3))
+par(pty="s")
 plot(resAM[,1],resAM[,2])
 plot(resASWAM[,1],resASWAM[,2])
 plot(resRAM[,1],resRAM[,2])
@@ -263,8 +257,6 @@ plot(resRAM[,1],resRAM[,2])
 
 It seems that in this case, AM and RAM have better performance compared with ASWAM.
 
-% data = rmt(n=1000,mean = mean, S = sigma, df = 1)
-% plot(data[,1],data[,2],xlim=c(-50,50),ylim=c(-50,50))
 \section{Testing}
 
 This package includes a suite of unit tests written in testthat to validate the functions AM, ASWAM and RAM. 

@@ -78,23 +78,18 @@ data <- ASWAM(function(x) {dmvnorm(x, rep(10, 8), 10*diag(8))},
               1000, rep(0, 8), diag(8))
 pairs(data)
 
-## ----chunk1--------------------------------------------------------------
+## ----chunk1, cache=TRUE--------------------------------------------------
 library(mvtnorm)  
-init.state = c(0,0,0)  
-d = length(init.state) 
-init.cov = diag(d)      
-target = function(x) {  
-   return(dmvnorm(t(x),rep(0,d),diag(d)))  
-}
+res <- RAM(function(x) {dmvnorm(x, rep(0, 3), diag(3))}, 10000, 
+           c(0,0,0), diag(3))
 
-res <- RAM(target,10000,init.state,init.cov)
+## ----chunk2, cache=TRUE, echo=FALSE, fig.height=3------------------------
+plot(res[,1],type = "l",xlab="iteration",main="Traceplot")
 
-## ----chunk2--------------------------------------------------------------
-par(mfrow=c(2,1))
-plot(res[,1],type = "l",xlab="iteration",main="traceplot ")
-hist(res[,1],main="histogram")
+## ----chunk2a, cache=TRUE, echo=FALSE, fig.height=3-----------------------
+hist(res[,1],main="Histogram")
 
-## ----chunk3--------------------------------------------------------------
+## ----chunk3, cache=TRUE--------------------------------------------------
 out_unadapt <- AMWG(adapt = 0, 1000, 500)
 theta_unadapt <- out_unadapt[[1]]
 acceptance_unadapt <- out_unadapt[[2]]
@@ -102,21 +97,18 @@ out_adapt <- AMWG(adapt = 1, 1000, 500)
 theta_adapt <- out_adapt[[1]]
 acceptance_adapt <- out_adapt[[2]]
 
+## ----chunk, cache=TRUE, echo=FALSE, fig.height=5-------------------------
 plot(theta_unadapt[,1],type="l",xlab="number of batch",ylab=expression(theta[1]),main=expression('traceplots of '*theta[1]*' using Metropolis within Gibbs'))
 lines(theta_adapt[,1],col=2)
 legend("topright",c("unadapted","adapted"),col=c(1,2),lwd=c(2,2))
 
-## ----chunk4--------------------------------------------------------------
+## ----chunk4, cache=TRUE, echo=FALSE, fig.height=5------------------------
 par(mfrow=c(2,1))
 hist(colMeans(acceptance_unadapt),main="histogram of acceptance ratio for K+3 parameters (unadapted)",xlab="",breaks=50)
 hist(colMeans(acceptance_adapt),main="histogram of acceptance ratio for K+3 parameters (adapted)",xlab="",breaks=50)
 
-## ----result = F----------------------------------------------------------
+## ----echo=FALSE, cache=TRUE, fig.height=3--------------------------------
 library(mnormt)
-library(lattice)
-library(coda)
-
-## ------------------------------------------------------------------------
 N=10000
 init.state = rnorm(2)    #random initialization
 d = length(init.state)
@@ -131,6 +123,8 @@ resAM <- AM(target, N, init.state, init.cov)
 resASWAM <- ASWAM(target, N, init.state, init.cov)
 resRAM <- RAM(target, N, init.state, init.cov)
 
+par(mfrow=c(1,3))
+par(pty="s")
 plot(resAM[,1],resAM[,2])
 plot(resASWAM[,1],resASWAM[,2])
 plot(resRAM[,1],resRAM[,2])
