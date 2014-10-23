@@ -22,6 +22,8 @@ These adaptive algorithms use various strategies to overcome a lack of knowledge
 \section{Introduction}
 This package implements a sequence of adaptive Metropolis Hastings algorithms that build on the each other to adapt to more complex distributions and one algorithm to handle nested models.
 
+The latest version of this project is available at \href{https://github.com/tom-jin/AdaptiveMetropolis}{\texttt{https://github.com/tom-jin/AdaptiveMetropolis}}
+
 \section{Adaptive MCMC Algorithms}
 <<packages, message=FALSE, cache=TRUE>>= 
 require(AdaptiveMetropolis) 
@@ -114,7 +116,9 @@ abline(v = 1000)
 @
 
 \subsection{Adaptive Scaling Within Adaptive Metropolis}
-An adaptive scaling with adaptive Metropolis implementation based on \citet{andrieu} scales its variance matrix in order to achieve a 0.23 acceptance ratio.
+An adaptive scaling with adaptive Metropolis implementation based on \citet{andrieu} scales its variance matrix in order to achieve a 0.23 acceptance ratio. This target acceptance ratio is chosen because it is the optimal value of a Langevin diffusion process in high dimensions. It strikes a balence between high acceptance but low mixing or low acceptance and prolonged periods of stationarity.
+
+This algorithm performs poorly in one dimension as a higher acceptance rate could be achieved without comprimising on mixing. In the following demonstration an eight dimensional multivariate Gaussian is explored for 1000 iterations after a burn in for 1000 iterations.
 
 <<ASWAM, cache=TRUE>>=
 library(mvtnorm)
@@ -228,7 +232,7 @@ hist(colMeans(acceptance_adapt),main="Histogram of acceptance ratio for K+3 para
 It can be seen that AMWG pulls the acceptance ratio towards 0.44, which is optimal in many settings.
 
 \subsection{Comparison}
-We compare the three generic algorithms(AM, ASWAM, RAM) here using a 2-dimensional student distribution with one degree of freedom. The simulated patterns are displayed below:
+We compare the three generic algorithms (AM, ASWAM, RAM) here using a 2-dimensional student distribution with one degree of freedom. The simulated patterns are displayed below:
 
 <<echo=FALSE, cache=TRUE, fig.height=3>>=
 library(mnormt)
