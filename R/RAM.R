@@ -11,6 +11,8 @@
 #' @return n samples from the target distribution.
 #' @export
 RAM <- function(target, N, init.state, init.cov)  {
+  # Input validation
+  validateInput(target, n, init.state, init.cov, burn.in)
   
   d <- length(init.state)  # dimension of the space of interest
   res <- matrix(, N, d)         # set up the result matrix, where each row n represents the parameter of length d at time n 
@@ -24,7 +26,7 @@ RAM <- function(target, N, init.state, init.cov)  {
     
     mean <- res[t-1, ]       # set the mean for the proposal to be the current state
     U <- rnorm(d)           # simulate a d-dimensional MVN variable
-    x <- mean + S %*% U          # calculate the proposed point
+    x <- as.vector(mean + S %*% U)         # calculate the proposed point
     alpha <- min(1, target(x)/target(res[t-1, ]))     #calculate acceptance probability
     u <- runif(1)                # simulate a uniform random variable and accept/reject the proposal accordingly.
     if (u<alpha) 
