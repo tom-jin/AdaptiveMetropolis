@@ -22,7 +22,7 @@ These adaptive algorithms use various strategies to overcome a lack of knowledge
 \section{Introduction}
 This package implements a sequence of adaptive Metropolis Hastings algorithms that build on the each other to adapt to more complex distributions and one algorithm to handle nested models.
 
-The latest version of this project is available at \href{https://github.com/tom-jin/AdaptiveMetropolis}{\texttt{https://github.com/tom-jin/AdaptiveMetropolis}}
+The latest version of this project is available at \href{https://github.com/tom-jin/AdaptiveMetropolis}{\texttt{https://github.com/tom-jin/AdaptiveMetropolis}}.
 
 \section{Adaptive MCMC Algorithms}
 <<packages, message=FALSE, cache=TRUE>>= 
@@ -106,7 +106,7 @@ plot(X, xlab = "Sample", ylab = "Value")
 abline(v = 1000)
 @
 
-In this example run no knowledge of the target distribution is assumed and the proposal distribution is set up as a univariate Gaussian with mean 0 and variance 1 but unknown to the sampler target distributions is a univariate Gaussian with mean 100 and variance 100. The sampler will have to find the mode and adapt its variance in order to explore it effectively.
+In this example demonstrating a run where no knowledge of the target distribution is available and the proposal distribution is set up as a univariate Gaussian with mean 0 and variance 1 but unknown to the sampler target distributions is a univariate Gaussian with mean 100 and variance 100. The sampler will have to find the mode and adapt its variance in order to explore it effectively.
 
 Normally the burn in samples are discarded due to poor mixing. They can be observed on the left of the vertical line at sample 1000. As soon as the adaptation begins the variance explodes and slowly tends towards variance 50000. Within a small number of iterations much of the mode has been explored.
 
