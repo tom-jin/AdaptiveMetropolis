@@ -21,5 +21,5 @@ Start with a Normal(0,1) distribution explore a Unif(0,100) distribution. The va
 
 ```R
 data <- AM(function(x) {dnorm(x, 0,100)}, 5000, 0, 1)
-plot(data[1001:5000])
+plot(data)
 ```
