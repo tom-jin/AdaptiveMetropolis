@@ -1,11 +1,11 @@
-## ----packages, message=FALSE---------------------------------------------
+## ----packages, message=FALSE, cache=TRUE---------------------------------
 require(AdaptiveMetropolis) 
 
-## ----AM-code, eval=FALSE-------------------------------------------------
+## ----AM-code, eval=FALSE, cache=TRUE-------------------------------------
 #  data <- AM(function(x) {dnorm(x, 100,100)}, 5000, 0, 1)
 #  plot(data)
 
-## ----AM-plots, cache=TRUE, echo=FALSE, message=FALSE---------------------
+## ----AM-plots, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5-------
 require(MASS)
 target <- function(x) {dnorm(x, 100,100)}
 n <- 5000
@@ -64,11 +64,11 @@ burn.in <- 1000
   }
 #par(mfrow=c(1,2))
 
-## ----AM-trace, cache=TRUE, echo=FALSE, message=FALSE---------------------
+## ----AM-trace, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5-------
 plot(X, xlab = "Sample", ylab = "Value")
 abline(v = 1000)
 
-## ----AM-variance, cache=TRUE, echo=FALSE, message=FALSE------------------
+## ----AM-variance, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5----
 plot(C, xlab = "Sample", ylab = "Variance")
 abline(v = 1000)
 

@@ -1,8 +1,8 @@
-\documentclass{article}
+\documentclass[a4paper]{article}
 \usepackage{hyperref}
 \usepackage{amsmath, amsthm, amssymb}
 \usepackage[round]{natbib}
-
+\usepackage{fullpage}
 % The line below tells R to use knitr on this.
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Introduction to Adaptive Metropolis}
@@ -20,7 +20,7 @@ These adaptive algorithms use various strategies to overcome a lack of knowledge
 \end{abstract}
 
 \section{Introduction}
-<<packages, message=FALSE>>= 
+<<packages, message=FALSE, cache=TRUE>>= 
 require(AdaptiveMetropolis) 
 @
 This package implements a sequence of adaptive Metropolis Hastings algorithms that build on the each other to adapt to more complex distributions and one algorithm to handle nested models.
@@ -37,13 +37,13 @@ For this algorithm it is essential that a burn in of some length is run to preve
 This happens when the initial jumps are very close together and very correlated causing subsequent samples to be highly correlated until the chain breaks free after several thousand iterations. 
 By running a burn in phase of random walk Metropolis Hastings the chain has had the opportunity to explore a little and adapt much faster.
 
-<<AM-code, eval=FALSE>>=
+<<AM-code, eval=FALSE, cache=TRUE>>=
 data <- AM(function(x) {dnorm(x, 100,100)}, 5000, 0, 1)
 plot(data)
 @
 
 
-<<AM-plots, cache=TRUE, echo=FALSE, message=FALSE>>=
+<<AM-plots, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5>>=
 require(MASS)
 target <- function(x) {dnorm(x, 100,100)}
 n <- 5000
@@ -102,7 +102,7 @@ burn.in <- 1000
   }
 #par(mfrow=c(1,2))
 @
-<<AM-trace, cache=TRUE, echo=FALSE, message=FALSE>>=
+<<AM-trace, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5>>=
 plot(X, xlab = "Sample", ylab = "Value")
 abline(v = 1000)
 @
@@ -111,7 +111,7 @@ In this example run no knowledge of the target distribution is assumed and the p
 
 Normally the burn in samples are discarded due to poor mixing. They can be observed on the left of the vertical line at sample 1000. As soon as the adaptation begins the varaince exploads and slowly tends towards variance 50000. Within a small number of iterations much of the mode has been explored.
 
-<<AM-variance, cache=TRUE, echo=FALSE, message=FALSE>>=
+<<AM-variance, cache=TRUE, echo=FALSE, message=FALSE, fig.height=5>>=
 plot(C, xlab = "Sample", ylab = "Variance")
 abline(v = 1000)
 @
@@ -180,7 +180,7 @@ hist(res[,1],main="Histogram")
 
 
 \subsubsection{introduction}
-We implement one of the examples in Gareth's\cite{Gareth} paper, namely the Metropolis Within Gibbs Algorithm (MWGA), which applies the algorithm to a hierarchical model:
+We implement one of the examples in \citet{roberts}, namely the Metropolis Within Gibbs Algorithm (MWGA), which applies the algorithm to a hierarchical model:
 
 \begin{itemize}
 \item Each observation $Y_{ij} \sim N(\theta_i,V)$ for $[1 \leq j \leq r_i]$.
